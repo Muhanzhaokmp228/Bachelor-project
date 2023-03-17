@@ -131,7 +131,7 @@ class DimrothWatson(rv_continuous):
 
         return p
 
-    def _rvs(self, k, max_iter=100):
+    def _rvs(self, k, size, max_iter=100):
         r"""
         random variate sampling
 
