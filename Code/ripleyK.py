@@ -58,13 +58,13 @@ def shortest_path(vecs, faces, vs, vt):
     shortest_path = math.inf
 
     # get the indices and coordinates of the closest vertices to the source and target points
-    #ds = igl.point_mesh_squared_distance(vs, vecs, faces)
-    ds = igl.signed_distance(vs, vecs, faces)
+    ds = igl.point_mesh_squared_distance(vs, vecs, faces)
+    # ds = igl.signed_distance(vs, vecs, faces)
     svec = faces[ds[1]]
     svec_coords = vecs[svec]
     
-    #dt = igl.point_mesh_squared_distance(vt, vecs, faces)
-    dt = igl.signed_distance(vt, vecs, faces)
+    dt = igl.point_mesh_squared_distance(vt, vecs, faces)
+    #dt = igl.signed_distance(vt, vecs, faces)
     tvec = faces[dt[1]]
     tvec_coords = vecs[tvec]
 
