@@ -88,6 +88,7 @@ def pair_distance_mesh(vecs, faces, samples):
     dist = []
     point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
     samples = np.array(proj_points_to_mesh(vecs, faces, samples))
+    point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
     for i in range(npts):
         for j in range(i+1, npts):
             # reshape to (1,3) array
