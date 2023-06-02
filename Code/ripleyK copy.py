@@ -39,43 +39,46 @@ def ripleyK(r, data, radii):
 
 #Projecting the point on the mesh
 def project_point_to_mesh(point, vecs):
-    u = vecs[1] - vecs[0]
-    v = vecs[2] - vecs[0]
-    n = np.cross(u, v)
-    w = point - vecs[0]
-
-    gamma = np.dot(np.cross(u, w), n) / np.dot(n, n)
-    beta = np.dot(np.cross(w, v), n) / np.dot(n, n)
-    alpha = 1 - gamma - beta
-
-    y = alpha * vecs[0] + beta * vecs[1] + gamma * vecs[2]
+    v1 = vecs[1] - vecs[0]
+    v2 = vecs[2] - vecs[0]
+    
+    # normal = np.cross(v1, v2) # Calculate the normal vector of the plane
+    # # v = point - vecs[0] # Calculate direction vector of the point to the plane
+    # vl = np.dot(point - vecs[0], normal) # Calculate the length of the projection vector
+    # nl = np.dot(normal, normal) # Calculate the length of the normal vector
+    # y = point - vl / nl * normal # Calculate the projection point
+    A = vecs
+    # Pmaxtrix = A * np.linalg.inv(A.T * A) * A.T
+    # y = Pmaxtrix * point.T
+    
+    Pmatrix = np.dot(A, np.dot(np.linalg.inv(np.dot(A.T, A)), A.T))
+    y = np.dot(Pmatrix, point.T)
 
     return y
-
-def proj_points_to_mesh(vecs, faces, samples):
-    npts = np.shape(samples)[0]
-    proj_points = []
-    point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
-    for i in range(npts):
-        # reshape to (1,3) array
-        vs = samples[i].reshape(1,3)
-        svec = faces[point_mesh[1][i]]
-        y = project_point_to_mesh(vs, vecs[svec]).astype(float)
-        proj_points.append(y)
-    return proj_points
 
 # Calculating the shortest path between two points on the mesh
 def shortest_path(vecs, faces, vs, vt, svec ,tvec):
 
     shortest_path = math.inf
 
-    # find the closest vertices to the source and target points
-    svec_coords = vecs[svec] 
-    tvec_coords = vecs[tvec]
+    # # get the indices and coordinates of the closest vertices to the source and target points
+    # ds = igl.point_mesh_squared_distance(vs, vecs, faces)
+    # # ds = igl.signed_distance(vs, vecs, faces)
+    # svec = faces[ds[1]]
+    svec_coords = vecs[svec] # coordinate for the 3 closest vertices to the source
+    
+    # dt = igl.point_mesh_squared_distance(vt, vecs, faces)
+    # #dt = igl.signed_distance(vt, vecs, faces)
+    # tvec = faces[dt[1]]
+    tvec_coords = vecs[tvec] # coordinate for the 3 closest vertices to the target
 
     # find the shortest path between the source and target points
+    vs = project_point_to_mesh(vs, svec_coords).astype(float) # project the source point on the mesh
     dist_vs_vecs = np.linalg.norm(vs-svec_coords, axis=1) # distance between the source point and the closest vertices
+    # print(dist_vs_vecs)
+    vt = project_point_to_mesh(vt, tvec_coords).astype(float) # project the target point on the mesh
     dist_vt_vecs = np.linalg.norm(vt-tvec_coords, axis=1) # distance between the target point and the closest vertices
+    # print(dist_vt_vecs)
     dist_vecs = igl.exact_geodesic(vecs, faces, svec, tvec) # distance between the closest vertices
     dist = dist_vs_vecs + dist_vecs + dist_vt_vecs # total distance
     shortest_path = np.min(dist)
@@ -86,8 +89,6 @@ def shortest_path(vecs, faces, vs, vt, svec ,tvec):
 def pair_distance_mesh(vecs, faces, samples):
     npts = np.shape(samples)[0]
     dist = []
-    point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
-    samples = np.array(proj_points_to_mesh(vecs, faces, samples))
     point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
     for i in range(npts):
         for j in range(i+1, npts):
