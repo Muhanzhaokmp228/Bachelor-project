@@ -45,8 +45,8 @@ def readmitodata(fname):
 
 current_dir = os.getcwd()
 print(current_dir)
-data_dir = os.path.join(current_dir, "Code", "mito_data")
-result_dir = os.path.join(current_dir, "Code", "mito_result")
+data_dir = os.path.join(current_dir, "mito_data")
+result_dir = os.path.join(current_dir, "mito_result")
 
 for file_name in os.listdir(data_dir):
     if file_name.endswith(".mat"):
