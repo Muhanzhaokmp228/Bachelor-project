@@ -45,7 +45,7 @@ def readmitodata(fname):
 
 current_dir = os.getcwd()
 print(current_dir)
-data_dir = os.path.join(current_dir, "mito_data")
+data_dir = os.path.join(current_dir, "mito_muhan")
 result_dir = os.path.join(current_dir, "mito_result")
 
 for file_name in os.listdir(data_dir):
@@ -56,6 +56,7 @@ for file_name in os.listdir(data_dir):
         faces = np.array(mito['faces'], dtype=np.int32)
         cj = np.array(mito['cristae_junction'], dtype=np.float64)
         points = cj.T
+        points = points[:, [1, 0, 2]].astype(np.float64)
         rmax = math.sqrt(rk.mesh_area(vertices, faces) / 2)
         radii = np.linspace(0, rmax, 50)
         if cj.size:
