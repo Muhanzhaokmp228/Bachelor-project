@@ -52,7 +52,6 @@ def project_point_to_mesh(point, vecs):
     return y
     # if alpha >= 0 and alpha <= 1 and beta >= 0 and beta <= 1 and gamma >= 0 and gamma <= 1:
 
-
 def proj_points_to_mesh(vecs, faces, samples):
     npts = np.shape(samples)[0]
     proj_points = []
@@ -87,8 +86,8 @@ def shortest_path(vecs, faces, vs, vt, svec ,tvec):
 def pair_distance_mesh(vecs, faces, samples):
     npts = np.shape(samples)[0]
     dist = []
-    point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
     samples = np.array(proj_points_to_mesh(vecs, faces, samples))
+    point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
     # point_mesh = igl.signed_distance(samples, vecs, faces)
     for i in range(npts):
         for j in range(i+1, npts):
