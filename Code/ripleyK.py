@@ -7,10 +7,8 @@ import igl
 # Source: https://www.math.ksu.edu/~dbski/writings/haversine.pdf
 
 def distance(r,vec1,vec2):
-    # pythagorean theorem
-    d = np.linalg.norm(vec1-vec2)
     # Arc Distance
-    dist = r * 2 * math.asin(d/2)
+    dist = r * np.arccos(np.dot(vec1,vec2)/r**2)
     return dist
 
 def pairDistances(r, data):
