@@ -3,13 +3,8 @@ import csv
 import igl
 import math
 import ripleyK as rk
-import ripleyKtest as rkt
-import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d
 from scipy.io import loadmat 
 import os
-import geopandas as gpd
-import plotly.graph_objects as go
 
 def readmitodata(fname):
     """
@@ -44,7 +39,7 @@ def readmitodata(fname):
     return mito_dict
 
 current_dir = os.getcwd()
-data_dir = os.path.join(current_dir, "mito_data")
+data_dir = os.path.join(current_dir, "mito_data_error")
 result_dir = os.path.join(current_dir, "mito_result")
 
 for file_name in os.listdir(data_dir):
