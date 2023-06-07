@@ -1,15 +1,10 @@
 import numpy as np
-import csv
-import igl
 import math
 import ripleyK as rk
-import ripleyKtest as rkt
-import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d
+import ripleyKmito as rkm
 from scipy.io import loadmat 
 import os
-import geopandas as gpd
-import plotly.graph_objects as go
+
 
 def readmitodata(fname):
     """
@@ -44,7 +39,7 @@ def readmitodata(fname):
     return mito_dict
 
 current_dir = os.getcwd()
-data_dir = os.path.join(current_dir, "mito_muhan")
+data_dir = os.path.join(current_dir, "mito_data")
 result_dir = os.path.join(current_dir, "mito_result")
 
 for file_name in os.listdir(data_dir):
@@ -56,11 +51,11 @@ for file_name in os.listdir(data_dir):
         cj = np.array(mito['cristae_junction'], dtype=np.float64)
         points = cj.T
         points = points[:, [1, 0, 2]].astype(np.float64)
-        rmax = math.sqrt(rk.mesh_area(vertices, faces) / 2)
-        radii = np.linspace(0, rmax, 50)
+        rmax = math.sqrt(rkm.mesh_area(vertices, faces) / 2)
+        radii = np.linspace(0, rmax+rmax/8, 50)
         if cj.size:
             print(file_name)
-            kt_mito = rk.ripleyK_mesh(vertices, faces, points, radii)
+            kt_mito = rkm.ripleyK_mesh(vertices, faces, points, radii)
             data = np.column_stack((radii, kt_mito))
             result_path = os.path.join(result_dir, os.path.splitext(file_name)[0] + ".csv")
             np.savetxt(result_path, data, delimiter=",", header='radii,kt_mito')

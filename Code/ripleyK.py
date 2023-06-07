@@ -46,9 +46,11 @@ def project_point_to_mesh(point, vecs):
     beta = np.dot(np.cross(w, v), n) / np.dot(n, n)
     alpha = 1 - gamma - beta
 
-    y = alpha * vecs[0] + beta * vecs[1] + gamma * vecs[2]
-    return y
-    # if alpha >= 0 and alpha <= 1 and beta >= 0 and beta <= 1 and gamma >= 0 and gamma <= 1:
+    if alpha >= 0 and alpha <= 1 and beta >= 0 and beta <= 1 and gamma >= 0 and gamma <= 1:
+        y = alpha * vecs[0] + beta * vecs[1] + gamma * vecs[2]
+        return y
+    else:
+        return None
 
 def proj_points_to_mesh(vecs, faces, samples):
     npts = np.shape(samples)[0]

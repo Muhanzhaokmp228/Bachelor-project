@@ -39,14 +39,14 @@ def ripleyK(r, data, radii):
 def pair_distance_mesh(vecs, faces, samples):
     npts = np.shape(samples)[0]
     dist = []
-    point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
-    sqrD, face_idx, cvecs = point_mesh
+    sqrD, face_idx, cvecs = igl.point_mesh_squared_distance(samples, vecs, faces)
     for i in range(npts):
         for j in range(i+1, npts):
-            # reshape to (1,3) array
-            svec = cvecs[i]
-            tvec = cvecs[j]
-            d = igl.exact_geodesic(vecs, faces, svec, tvec) # distance between the closest vertices
+            svec = faces[face_idx[i]][1] 
+            tvec = faces[face_idx[j]][1]
+            svec = np.array([svec])
+            tvec = np.array([tvec])
+            d = igl.exact_geodesic(vecs, faces, svec, tvec)
             dist.append(d)
     return dist
 
@@ -66,39 +66,3 @@ def ripleyK_mesh(vecs, faces, data, radii):
         K[i] = np.sum(dists < radii[i])
     K = K / intensity
     return K
-
-def samples_uniform_sphere(n):
-    # Generating z coordinates with radius = 1
-    z = np.random.uniform(-1,1,n)
-
-    # Generating azimuthal angles
-    phi = np.random.uniform(0,2*math.pi,n)
-
-    # Generating x and y coordinates
-    x = np.sqrt(1-z**2)*np.cos(phi)
-    y = np.sqrt(1-z**2)*np.sin(phi)
-    samples = np.array([x,y,z]).T
-    return samples
-
-def sample_faces(vertices, faces, num_samples):
-    # calculate the area of each triangle
-    a = vertices[faces[:, 0]]
-    b = vertices[faces[:, 1]]
-    c = vertices[faces[:, 2]]
-    areas = np.linalg.norm(np.cross(b-a, c-a), axis=1) / 2
-
-    # normalize areas to get probability distribution
-    probabilities = areas / np.sum(areas)
-
-    # randomly choose triangles to sample from
-    face_indices = np.random.choice(len(faces), size=num_samples, p=probabilities)
-
-    # generate random points within each selected triangle
-    u = np.random.rand(num_samples, 1)
-    v = np.random.rand(num_samples, 1)
-    a = vertices[faces[face_indices, 0]]
-    b = vertices[faces[face_indices, 1]]
-    c = vertices[faces[face_indices, 2]]
-    points = (1 - u) * a + (u * (1 - v)) * b + (u * v) * c
-
-    return points
