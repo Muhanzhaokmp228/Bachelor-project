@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import igl
 import ripleyK as rk
 import ripleyKmito as rkm
 from scipy.io import loadmat 
@@ -37,6 +38,27 @@ def readmitodata(fname):
     # count starts at 0
     mito_dict['faces'] -= 1
     return mito_dict
+
+
+# Calculating the distance between all pairs of points on the mesh
+def pair_distance_mesh(vertices, faces, samples):
+    npts = np.shape(samples)[0]
+    dist = []
+    sqrD, face_idx, cvecs = igl.point_mesh_squared_distance(samples, vertices, faces)
+    # print(face_idx)
+    # print("cvecs: ", cvecs)
+    # print(faces[face_idx])
+    # print(vecs[faces[face_idx]])
+    for i in range(npts-1):
+        # print(faces[face_idx])
+        vs = np.array([faces[face_idx][i][1]])
+        # print("vs:", vs)
+        vt = np.array(faces[face_idx][i+1:,1:2])
+        # print("vt:", vt)
+        d = igl.exact_geodesic(vertices, faces, vs, vt)
+        # print("d: ", d)
+        dist.append(d)
+    return dist
 
 current_dir = os.getcwd()
 data_dir = os.path.join(current_dir, "mito_data")

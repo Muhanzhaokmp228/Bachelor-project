@@ -38,8 +38,29 @@ def readmitodata(fname):
     mito_dict['faces'] -= 1
     return mito_dict
 
+
+# Calculating the distance between all pairs of points on the mesh
+def pair_distance_mesh(vertices, faces, samples):
+    npts = np.shape(samples)[0]
+    dist = []
+    sqrD, face_idx, cvecs = igl.point_mesh_squared_distance(samples, vertices, faces)
+    # print(face_idx)
+    # print("cvecs: ", cvecs)
+    # print(faces[face_idx])
+    # print(vecs[faces[face_idx]])
+    for i in range(npts-1):
+        # print(faces[face_idx])
+        vs = np.array([faces[face_idx][i][1]])
+        # print("vs:", vs)
+        vt = np.array(faces[face_idx][i+1:,1:2])
+        # print("vt:", vt)
+        d = igl.exact_geodesic(vertices, faces, vs, vt)
+        # print("d: ", d)
+        dist.append(d)
+    return dist
+
 current_dir = os.getcwd()
-data_dir = os.path.join(current_dir, "mito_data_error")
+data_dir = os.path.join(current_dir, "mito_data")
 result_dir = os.path.join(current_dir, "mito_result")
 
 for file_name in os.listdir(data_dir):
@@ -51,14 +72,12 @@ for file_name in os.listdir(data_dir):
         cj = np.array(mito['cristae_junction'], dtype=np.float64)
         points = cj.T
         points = points[:, [1, 0, 2]].astype(np.float64)
-        rmax = math.sqrt(rk.mesh_area(vertices, faces) / 2)
-        radii = np.linspace(0, rmax, 50)
         if cj.size:
             print(file_name)
-            kt_mito = rk.ripleyK_mesh(vertices, faces, points, radii)
-            data = np.column_stack((radii, kt_mito))
+            dist = pair_distance_mesh(vertices, faces, points)
+            dist = np.array(dist)
             result_path = os.path.join(result_dir, os.path.splitext(file_name)[0] + ".csv")
-            np.savetxt(result_path, data, delimiter=",", header='radii,kt_mito')
+            np.savetxt(result_path, dist, delimiter=",", header='radii,kt_mito')
             print(file_name + " result saved")
         else:
             print("No cristae junctions found")

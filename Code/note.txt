@@ -1,7 +1,0 @@
-afstandsfelter 
-
-samples på ækvator
-phi, theta = 
-
-phi = uniform (0, 2pi)
-theta = uniform (pi/2 - e, pi/2 + e) e small
