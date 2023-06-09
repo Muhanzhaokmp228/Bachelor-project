@@ -1,2 +1,0 @@
-
-from watson_distribution import DimrothWatson

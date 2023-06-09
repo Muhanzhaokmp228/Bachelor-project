@@ -60,6 +60,26 @@ def pair_distance_mesh(vertices, faces, samples):
         dist.append(d)
     return dist
 
+# Calculating the surface area of the mesh
+def mesh_area(vecs, faces):
+    double_areas = igl.doublearea(vecs, faces)
+    surface_area = np.sum(double_areas) / 2.0
+    return surface_area
+
+# Ripley's K function for mesh
+def ripleyK_mesh(vecs, faces, data):
+    area = mesh_area(vecs, faces)
+    dists = pair_distance_mesh(vecs, faces, data)
+    dists = np.hstack(dists)
+    rmax = np.max(dists)
+    radii = np.linspace(0, rmax, 50)
+    K = np.zeros(len(radii))
+    intensity = len(dists) / area
+    for i in range(len(radii)):
+        K[i] = np.sum(dists < radii[i])
+    K = K / intensity
+    return radii, K
+
 current_dir = os.getcwd()
 data_dir = os.path.join(current_dir, "mito_data")
 result_dir = os.path.join(current_dir, "mito_result")
@@ -77,7 +97,7 @@ for file_name in os.listdir(data_dir):
         radii = np.linspace(0, rmax+rmax/8, 50)
         if cj.size:
             print(file_name)
-            kt_mito = rkm.ripleyK_mesh(vertices, faces, points, radii)
+            kt_mito = ripleyK_mesh(vertices, faces, points, radii)
             data = np.column_stack((radii, kt_mito))
             result_path = os.path.join(result_dir, os.path.splitext(file_name)[0] + ".csv")
             np.savetxt(result_path, data, delimiter=",", header='radii,kt_mito')
