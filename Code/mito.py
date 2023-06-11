@@ -66,6 +66,7 @@ def ripleyK_mesh(vecs, faces, data):
     K = K / intensity
     return radii, K
 
+# Loop through all the mito data files and calculate the Ripley's K function
 current_dir = os.getcwd()
 data_dir = os.path.join(current_dir, "mito_data")
 result_dir = os.path.join(current_dir, "mito_result")
