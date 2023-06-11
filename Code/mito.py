@@ -45,34 +45,20 @@ def pair_distance_mesh(vertices, faces, samples):
     npts = np.shape(samples)[0]
     dist = []
     sqrD, face_idx, cvecs = igl.point_mesh_squared_distance(samples, vertices, faces)
-    # print(face_idx)
-    # print("cvecs: ", cvecs)
-    # print(faces[face_idx])
-    # print(vecs[faces[face_idx]])
     for i in range(npts-1):
-        # print(faces[face_idx])
         vs = np.array([faces[face_idx][i][1]])
-        # print("vs:", vs)
         vt = np.array(faces[face_idx][i+1:,1:2])
-        # print("vt:", vt)
         d = igl.exact_geodesic(vertices, faces, vs, vt)
-        # print("d: ", d)
         dist.append(d)
     return dist
 
-# Calculating the surface area of the mesh
-def mesh_area(vecs, faces):
-    double_areas = igl.doublearea(vecs, faces)
-    surface_area = np.sum(double_areas) / 2.0
-    return surface_area
-
 # Ripley's K function for mesh
 def ripleyK_mesh(vecs, faces, data):
-    area = mesh_area(vecs, faces)
+    area = np.sum(igl.doublearea(vecs, faces)) / 2.0
     dists = pair_distance_mesh(vecs, faces, data)
     dists = np.hstack(dists)
     rmax = np.max(dists)
-    radii = np.linspace(0, rmax, 50)
+    radii = np.linspace(0, rmax+rmax/8, 50)
     K = np.zeros(len(radii))
     intensity = len(dists) / area
     for i in range(len(radii)):
@@ -97,7 +83,7 @@ for file_name in os.listdir(data_dir):
         radii = np.linspace(0, rmax+rmax/8, 50)
         if cj.size:
             print(file_name)
-            kt_mito = ripleyK_mesh(vertices, faces, points, radii)
+            radii, kt_mito = ripleyK_mesh(vertices, faces, points)
             data = np.column_stack((radii, kt_mito))
             result_path = os.path.join(result_dir, os.path.splitext(file_name)[0] + ".csv")
             np.savetxt(result_path, data, delimiter=",", header='radii,kt_mito')

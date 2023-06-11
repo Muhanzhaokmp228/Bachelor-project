@@ -6,11 +6,13 @@ import igl
 # https://www.cuemath.com/trigonometry/trigonometric-table/
 # Source: https://www.math.ksu.edu/~dbski/writings/haversine.pdf
 
+# Great Circle Distance between two points on a sphere
 def distance(r,vec1,vec2):
     # Arc Distance
     dist = r * np.arccos(np.dot(vec1,vec2)/r**2)
     return dist
 
+# distance between all pairs of points on a sphere
 def pairDistances(r, data):
     npts = np.shape(data)[0]
     dist = []
@@ -19,15 +21,10 @@ def pairDistances(r, data):
             dist.append(distance(r, data[i], data[j]))
     return dist
 
-# Calculating the distance between all pairs of points
-def surfaceArea(r):
-    area = 4 * math.pi * r**2
-    return area
-
 # Ripley's K function for sphere
 def ripleyK(r, data, radii):
     K = np.zeros_like(radii)
-    area = surfaceArea(r)
+    area = area = 4 * math.pi * r**2
     dist = pairDistances(r, data)
     intensity = len(dist) / area
     for i in range(len(radii)):
@@ -64,7 +61,7 @@ def proj_points_to_mesh(vecs, faces, samples):
         proj_points.append(y)
     return proj_points
 
-# Calculating the shortest path between two points on the mesh
+# Calculating the geodesic path between two points on the mesh
 def shortest_path(vecs, faces, vs, vt, svec ,tvec):
 
     shortest_path = math.inf
@@ -74,9 +71,9 @@ def shortest_path(vecs, faces, vs, vt, svec ,tvec):
     tvec_coords = vecs[tvec]
 
     # find the shortest path between the source and target points
-    dist_vs_vecs = np.linalg.norm(vs-svec_coords, axis=1) # distance between the source point and the closest vertices
-    dist_vt_vecs = np.linalg.norm(vt-tvec_coords, axis=1) # distance between the target point and the closest vertices
-    dist_vecs = igl.exact_geodesic(vecs, faces, svec, tvec) # distance between the closest vertices
+    dist_vs_vecs = np.linalg.norm(vs-svec_coords, axis=1) 
+    dist_vt_vecs = np.linalg.norm(vt-tvec_coords, axis=1) 
+    dist_vecs = igl.exact_geodesic(vecs, faces, svec, tvec) 
     dist = dist_vs_vecs + dist_vecs + dist_vt_vecs # total distance
     shortest_path = np.min(dist)
     
@@ -116,19 +113,6 @@ def ripleyK_mesh(vecs, faces, data, radii):
         K[i] = np.sum(dists < radii[i])
     K = K / intensity
     return K
-
-def samples_uniform_sphere(n):
-    # Generating z coordinates with radius = 1
-    z = np.random.uniform(-1,1,n)
-
-    # Generating azimuthal angles
-    phi = np.random.uniform(0,2*math.pi,n)
-
-    # Generating x and y coordinates
-    x = np.sqrt(1-z**2)*np.cos(phi)
-    y = np.sqrt(1-z**2)*np.sin(phi)
-    samples = np.array([x,y,z]).T
-    return samples
 
 def sample_faces(vertices, faces, num_samples):
     # calculate the area of each triangle
