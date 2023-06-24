@@ -83,7 +83,7 @@ def shortest_path(vecs, faces, vs, vt, svec ,tvec):
 def pair_distance_mesh(vecs, faces, samples):
     npts = np.shape(samples)[0]
     dist = []
-    samples = np.array(proj_points_to_mesh(vecs, faces, samples))
+    # samples = np.array(proj_points_to_mesh(vecs, faces, samples))
     point_mesh = igl.point_mesh_squared_distance(samples, vecs, faces)
     # point_mesh = igl.signed_distance(samples, vecs, faces)
     for i in range(npts):
